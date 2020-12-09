@@ -39,7 +39,7 @@ async function updateQuotes() {
 router.post("/login", async (req, res) => {
     try{
         if(!req.body.email){
-            return res.status(400).send({error: "Bad request, missing mail field!"});
+            return res.status(400).send({error: "Bad request, missing e-mail field!"});
         }else if(!req.body.password){
             return res.status(400).send({error: "Bad request, missing the password field!"});
         }
@@ -47,6 +47,19 @@ router.post("/login", async (req, res) => {
         const token = await user.user.getIdToken();
         logged = true;
         return res.status(201).json({ token });
+    }catch(error){
+        return res.status(500).send({error: error.toString()});
+    }
+});
+
+router.get("/logout", async (req, res) => {
+    try{
+        if(!logged){
+            return res.status(401).json({error: "You must be logged before log out"});
+        }
+        const user = await firebase.auth().signOut();
+        logged = false;
+        return res.status(200).json({message: "You logged out!"});
     }catch(error){
         return res.status(500).send({error: error.toString()});
     }
